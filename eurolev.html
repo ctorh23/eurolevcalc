@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калкулатор ресто ЕВРО-ЛЕВ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .form-row {
+            margin-bottom: 10px; /* Space between rows */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .form-row label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .left-part {
+            flex: 0 0 40%; /* Reduce width of left part */
+            margin-right: 5px; /* Space between left and right parts */
+        }
+        .right-part {
+            flex: 1; /* Right part takes remaining space */
+        }
+        .form-row input {
+            width: calc(100% - 5px); /* Full width minus some space */
+            max-width: 7ch; /* Limit input width to 7 characters */
+            padding: 8px;
+        }
+        select {
+            width: 80px; /* Set a fixed width for the drop-down to clearly show all letters */
+            padding: 8px; /* Consistent padding */
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <form id="simpleForm">
+        <div class="form-row">
+            <div class="left-part">
+                <label for="price">Цена</label>
+                <input type="text" id="price" maxlength="7" required>
+            </div>
+            <div class="right-part">
+                <span>ЕВРО</span>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="left-part">
+                <label for="amount">Сума</label>
+                <input type="text" id="amount" maxlength="7" required>
+            </div>
+            <div class="right-part">
+                <select id="currency">
+                    <option value="BGN">ЛЕВ</option>
+                    <option value="EURO">ЕВРО</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="left-part"><span id="changeEURO">0</span> ЕВРО</div>
+            <div class="right-part"><span id="changeBGN">0</span> ЛЕВ</div>
+        </div>
+
+        <div class="form-row">
+            <div class="left-part button-container">
+                <button type="button" onclick="clearFields()">Изтрий</button>
+            </div>
+            <div class="right-part button-container">
+                <button type="button" onclick="calcChange()">Сметни</button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        function clearFields() {
+            document.getElementById('price').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('changeEURO').innerText = 0;
+            document.getElementById('changeBGN').innerText = 0;
+        }
+
+        function calcChange() {
+            const rate = 1.95583;
+            const price = Number.parseFloat(document.getElementById('price').value);
+            const amount = Number.parseFloat(document.getElementById('amount').value);
+            const currency = document.getElementById('currency').value;
+            
+            var changeEURO = 0;
+            var changeBGN = 0;
+
+            if (amount > 0) {
+                var amountConverted = currency === 'BGN' ? amount / rate : amount;
+                
+                if (amountConverted >= price) {
+                    changeEURO = amountConverted - price;
+                    changeBGN = changeEURO * rate;
+                    document.getElementById('changeEURO').innerText = changeEURO.toFixed(2);
+                    document.getElementById('changeBGN').innerText = changeBGN.toFixed(2);
+                } else {
+                    alert(`Сумата конвертирана в ЕВРО (${amountConverted.toFixed(2)}) трябва да бъде по-голяма от цената (${price} ЕВРО)!`);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
