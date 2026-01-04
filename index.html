@@ -30,7 +30,7 @@
         }
         .form-row input {
             width: calc(100% - 5px); /* Full width minus some space */
-            max-width: 7ch; /* Limit input width to 7 characters */
+            max-width: 11ch; /* Limit input width to 7 characters */
             padding: 8px;
         }
         select {
@@ -51,11 +51,13 @@
     <form id="simpleForm">
         <div class="form-row">
             <div class="left-part">
-                <label for="price">Цена</label>
-                <input type="text" id="price" maxlength="7" required>
+                <label for="price">Цена (ЕВРО)</label>
+                <input type="text" id="price" maxlength="7" required oninput="convertPrice()">
             </div>
             <div class="right-part">
-                <span>ЕВРО</span>
+                <label for="priceBGN">x 1.95583 (ЛЕВ)</label>
+                <input type="text" id="priceBGN" maxlength="7" disabled>
+                <!--<span id="priceBGN">0</span>лв.-->
             </div>
         </div>
         
@@ -65,6 +67,7 @@
                 <input type="text" id="amount" maxlength="7" required>
             </div>
             <div class="right-part">
+                <label for="currency">Валута</label>
                 <select id="currency">
                     <option value="BGN">ЛЕВ</option>
                     <option value="EURO">ЕВРО</option>
@@ -88,15 +91,19 @@
     </form>
 
     <script>
-        function clearFields() {
+        const rate = 1.95583;
+
+        function clearFields()
+        {
             document.getElementById('price').value = '';
             document.getElementById('amount').value = '';
             document.getElementById('changeEURO').innerText = 0;
             document.getElementById('changeBGN').innerText = 0;
+            document.getElementById('priceBGN').value = '';
         }
 
-        function calcChange() {
-            const rate = 1.95583;
+        function calcChange()
+        {
             const price = Number.parseFloat(document.getElementById('price').value);
             const amount = Number.parseFloat(document.getElementById('amount').value);
             const currency = document.getElementById('currency').value;
@@ -116,6 +123,16 @@
                     alert(`Сумата конвертирана в ЕВРО (${amountConverted.toFixed(2)}) трябва да бъде по-голяма от цената (${price} ЕВРО)!`);
                 }
             }
+        }
+
+        function convertPrice()
+        {
+            var price = Number.parseFloat(document.getElementById('price').value);
+            if (price !== undefined && !Number.isNaN(price) && price > 0) {
+                document.getElementById('priceBGN').value = (price * rate).toFixed(2);
+            } else {
+                document.getElementById('priceBGN').value = '';
+            }            
         }
     </script>
 </body>
