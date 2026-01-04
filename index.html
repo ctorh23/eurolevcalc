@@ -112,7 +112,7 @@
             var changeBGN = 0;
 
             if (amount > 0) {
-                var amountConverted = currency === 'BGN' ? amount / rate : amount;
+                var amountConverted = (currency === 'BGN' ? amount / rate : amount).toFixed(2);
                 
                 if (amountConverted >= price) {
                     changeEURO = amountConverted - price;
@@ -120,7 +120,7 @@
                     document.getElementById('changeEURO').innerText = changeEURO.toFixed(2);
                     document.getElementById('changeBGN').innerText = changeBGN.toFixed(2);
                 } else {
-                    alert(`Сумата конвертирана в ЕВРО (${amountConverted.toFixed(2)}) трябва да бъде по-голяма от цената (${price} ЕВРО)!`);
+                    alert(`Сумата конвертирана в ЕВРО (${amountConverted}) трябва да бъде по-голяма от цената (${price} ЕВРО)!`);
                 }
             }
         }
