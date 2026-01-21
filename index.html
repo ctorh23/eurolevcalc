@@ -51,13 +51,12 @@
     <form id="simpleForm">
         <div class="form-row">
             <div class="left-part">
-                <label for="price">Цена (ЕВРО)</label>
-                <input type="text" id="price" maxlength="7" required oninput="convertPrice()">
+                <label for="priceEURO">Цена (ЕВРО)</label>
+                <input type="text" id="priceEURO" maxlength="7" required oninput="convertPrice(event)">
             </div>
             <div class="right-part">
                 <label for="priceBGN">x 1.95583 (ЛЕВ)</label>
-                <input type="text" id="priceBGN" maxlength="7" disabled>
-                <!--<span id="priceBGN">0</span>лв.-->
+                <input type="text" id="priceBGN" maxlength="7" oninput="convertPrice(event)">
             </div>
         </div>
         
@@ -95,44 +94,65 @@
 
         function clearFields()
         {
-            document.getElementById('price').value = '';
+            document.getElementById('priceEURO').value = '';
+            document.getElementById('priceBGN').value = '';
             document.getElementById('amount').value = '';
             document.getElementById('changeEURO').innerText = 0;
             document.getElementById('changeBGN').innerText = 0;
-            document.getElementById('priceBGN').value = '';
         }
 
         function calcChange()
         {
-            const price = Number.parseFloat(document.getElementById('price').value);
-            const amount = Number.parseFloat(document.getElementById('amount').value);
             const currency = document.getElementById('currency').value;
+            const amount = Number.parseFloat(document.getElementById('amount').value);
+            const priceEuro = document.getElementById('priceEURO').value;
+            const priceBgn = document.getElementById('priceBGN').value;
+            var changeEuro = 0;
+            var changeBgn = 0;
             
-            var changeEURO = 0;
-            var changeBGN = 0;
-
-            if (amount > 0) {
-                var amountConverted = (currency === 'BGN' ? amount / rate : amount).toFixed(2);
-                
-                if (amountConverted >= price) {
-                    changeEURO = amountConverted - price;
-                    changeBGN = changeEURO * rate;
-                    document.getElementById('changeEURO').innerText = changeEURO.toFixed(2);
-                    document.getElementById('changeBGN').innerText = changeBGN.toFixed(2);
-                } else {
-                    alert(`Сумата конвертирана в ЕВРО (${amountConverted}) трябва да бъде по-голяма от цената (${price} ЕВРО)!`);
+            if (amount > 0)
+            {
+                try {
+                    if (currency === 'EURO') {
+                        if (amount < priceEuro) {
+                            throw new Error('Сумата в EURO трябва да бъде по-голяма от цената в EURO!');
+                        }
+                        changeEuro = amount - priceEuro;
+                        changeBgn = changeEuro * rate;
+                    } else if (currency === 'BGN') {
+                        if (amount < priceBgn) {
+                            throw new Error('Сумата в ЛЕВ трябва да бъде по-голяма от цената в ЛЕВ!');
+                        }
+                        changeBgn = amount - priceBgn;
+                        changeEuro = changeBgn / rate;
+                    }
+                    document.getElementById('changeEURO').innerText = changeEuro.toFixed(2);
+                    document.getElementById('changeBGN').innerText = changeBgn.toFixed(2);
+                } catch (err) {
+                    alert(err);
                 }
             }
         }
 
-        function convertPrice()
+        function convertPrice(event)
         {
-            var price = Number.parseFloat(document.getElementById('price').value);
+            var priceId = event.target.id;
+            var price = Number.parseFloat(document.getElementById(priceId).value);
+            var priceConvertedId = '';
+            var multiplier = 1;
+            if (priceId === 'priceEURO') {
+                priceConvertedId = 'priceBGN';
+                multiplier = rate;
+            } else if (priceId === 'priceBGN') {
+                priceConvertedId = 'priceEURO';
+                multiplier = 1 / rate;
+            }
+
             if (price !== undefined && !Number.isNaN(price) && price > 0) {
-                document.getElementById('priceBGN').value = (price * rate).toFixed(2);
+                document.getElementById(priceConvertedId).value = (price * multiplier).toFixed(2);
             } else {
-                document.getElementById('priceBGN').value = '';
-            }            
+                document.getElementById(priceConvertedId).value = '';
+            }
         }
     </script>
 </body>
